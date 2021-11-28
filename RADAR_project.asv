@@ -162,18 +162,18 @@ figure,surf(doppler_axis,range_axis,RDM);
 
 % *%TODO* :
 %Select the number of Training Cells in both the dimensions.
-Tr = 26;
-Td = 28;
+Tr = 4;
+Td = 2;
 
 % *%TODO* :
 %Select the number of Guard Cells in both dimensions around the Cell under 
 %test (CUT) for accurate estimation
-Gr = 8;
-Gd = 6;
+Gr = 2;
+Gd = 1;
 
 % *%TODO* :
 % offset the threshold by SNR value in dB
-offset = 8;
+offset = 3;
 
 % *%TODO* :
 %Create matrix to store noise_level for each iteration on training cells
@@ -201,9 +201,9 @@ sig = zeros(Nr/2, Nd); % Initialize to hold final signal after thresholding
 for i = 1: (Nr/2-(2*Tr+2*Gr+1))
     for j = 1:(Nd-(2*Td+2*Gd+1))
         noise_T = sum(db2pow(RDM(i:i+2*Tr+2*Gr-1, j:j+2*Td+2*Gd-1)), 'all'); 
-        noise_G = sum(db2pow(RDM(i+Tr:i+Tr+2*Gr-1, j+Td:j+Td+2*Gd-1)),'all');
-        noise_level(i,j) = noise_T - noise_G;
-        threshold(i,j) = pow2db(noise_level(i,j)/size) + offset;
+        noise_G = sum(RDM(i+Tr:i+Tr+2*Gr-1, j+Td:j+Td+2*Gd-1)),'all');
+        noise_level(i,j) = db2pow(noise_T - noise_G);
+        threshold(i,j) = noise_level(i,j)/size + offset;
 
         if RDM(i+Tr+Gr, j+Td+Gd) > threshold(i,j)
             sig(i+Tr+Gr,j+Td+Gd) = 1;
